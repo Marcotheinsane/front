@@ -184,7 +184,7 @@ onMounted(() => {
           </svg>
         </div>
         <div class="flex-1">
-          <h2 class="text-3xl font-bold">{{ cliente.nombre }} {{ cliente.apellido }}</h2>
+          <h2 class="text-3xl font-bold">{{ cliente.nombres }} {{ cliente.apellidos }}</h2>
           <div class="text-muni-green-100 text-sm mt-2 space-y-1">
             <p>RUT: {{ cliente.rut }}</p>
             <p>ID: {{ cliente.id }}</p>
