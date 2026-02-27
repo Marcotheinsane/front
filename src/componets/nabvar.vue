@@ -9,7 +9,7 @@
         </svg>
       </div>
       <router-link to="/" class="font-bold text-2xl text-white hover:text-muni-green-100 transition duration-300 tracking-wider">
-        PDTI
+        TREKAN - PDTI
       </router-link>
     </div>
 
