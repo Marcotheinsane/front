@@ -37,60 +37,60 @@ const recargarLista = () => {
   cargarEstadisticas()
 }
 
-// Cargar estadísticas
+// Cargar estadísticas (OPTIMIZADO CON PROMISE.ALL)
 const cargarEstadisticas = async () => {
   try {
-    // Total de clientes
-    const responseClientes = await personasAPI.getAll()
+    // PASO 1: Obtener todas las listas en PARALELO (no secuencial)
+    const [responseClientes, responseAsuntos] = await Promise.all([
+      personasAPI.getAll(),
+      asuntosAPI.getAll()
+    ])
+    
     totalClientes.value = responseClientes.data?.length || 0
-    console.log('Total clientes:', totalClientes.value)
-
-    // Total de asuntos
-    const responseAsuntos = await asuntosAPI.getAll()
     totalAsuntos.value = responseAsuntos.data?.length || 0
-    console.log('Total asuntos:', totalAsuntos.value)
+    console.log('Total clientes:', totalClientes.value, '| Total asuntos:', totalAsuntos.value)
 
-    // Calcular porcentaje de asistencias hoy
+    // PASO 2: Calcular asistencias hoy (paralelo, no secuencial)
     const hoy = new Date()
     const fechaHoy = hoy.toISOString().split('T')[0]
     
+    const asuntos = responseAsuntos.data || []
+    
+    // Obtener todas las instancias en paralelo
+    const instanciasPromises = asuntos.map(asunto => 
+      instanciasAPI.getByAsunto(asunto.id).catch(() => ({ data: [] }))
+    )
+    const instanciasResponses = await Promise.all(instanciasPromises)
+    
+    // Filtrar instancias de hoy y obtener asistencia en paralelo
+    const asistenciaPromises = []
+    instanciasResponses.forEach(response => {
+      const instancias = response.data || []
+      instancias
+        .filter(inst => inst.fecha === fechaHoy)
+        .forEach(instancia => {
+          asistenciaPromises.push(
+            asistenciaAPI.getByInstancia(instancia.id).catch(() => ({ data: [] }))
+          )
+        })
+    })
+    
+    const asistenciaResponses = await Promise.all(asistenciaPromises)
+    
+    // Calcular porcentaje
     let totalRegistros = 0
     let totalAsistencias = 0
-
-    // Obtener instancias de hoy
-    const asuntos = responseAsuntos.data || []
-    for (const asunto of asuntos) {
-      try {
-        const responseInstancias = await instanciasAPI.getByAsunto(asunto.id)
-        const instancias = responseInstancias.data || []
-        
-        // Filtrar instancias de hoy
-        const instanciasHoy = instancias.filter(inst => inst.fecha === fechaHoy)
-        
-        for (const instancia of instanciasHoy) {
-          try {
-            const responseAsistencia = await asistenciaAPI.getByInstancia(instancia.id)
-            const registrosAsistencia = responseAsistencia.data || []
-            
-            totalRegistros += registrosAsistencia.length
-            totalAsistencias += registrosAsistencia.filter(r => r.asistio === true).length
-          } catch (err) {
-            console.warn('Error obteniendo asistencia:', err)
-          }
-        }
-      } catch (err) {
-        console.warn('Error obteniendo instancias:', err)
-      }
-    }
-
-    // Calcular porcentaje
-    if (totalRegistros > 0) {
-      porcentajeAsistencias.value = Math.round((totalAsistencias / totalRegistros) * 100)
-    } else {
-      porcentajeAsistencias.value = 0
-    }
+    asistenciaResponses.forEach(response => {
+      const registros = response.data || []
+      totalRegistros += registros.length
+      totalAsistencias += registros.filter(r => r.asistio === true).length
+    })
     
-    console.log(`Asistencias: ${totalAsistencias}/${totalRegistros} = ${porcentajeAsistencias.value}%`)
+    porcentajeAsistencias.value = totalRegistros > 0 
+      ? Math.round((totalAsistencias / totalRegistros) * 100) 
+      : 0
+    
+    console.log(`✓ Asistencias: ${totalAsistencias}/${totalRegistros} = ${porcentajeAsistencias.value}%`)
   } catch (err) {
     console.error('Error cargando estadísticas:', err)
   }

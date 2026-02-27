@@ -1,12 +1,16 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import Footer from '@/componets/Footer.vue'
 
 const router = useRouter()
 </script>
 
 <template>
-  <div id="app" class="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50">
-    <router-view />
+  <div id="app" class="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 flex flex-col">
+    <div class="flex-1">
+      <router-view />
+    </div>
+    <Footer />
   </div>
 </template>
 
