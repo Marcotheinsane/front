@@ -1,38 +1,111 @@
-# frontend
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-This template should help get you started developing with Vue 3 in Vite.
+# Frontend – Vue 3
 
-## Recommended IDE Setup
+Este repositorio contiene el frontend de la aplicación, desarrollado como un proyecto
+independiente y desacoplado del backend. La aplicación está construida con Vue 3 y Vite,
+siguiendo principios de separación de responsabilidades y comunicación mediante API REST.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+El objetivo de este repositorio es concentrar exclusivamente la lógica de presentación,
+la experiencia de usuario y la interacción con servicios externos expuestos por el backend.
 
-## Recommended Browser Setup
+## Alcance del proyecto
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+Este frontend se encarga de:
+- Renderizar la interfaz de usuario
+- Gestionar el estado de la aplicación en el cliente
+- Realizar peticiones HTTP hacia una API externa
+- Manejar validaciones del lado del cliente
+- Representar respuestas y errores provenientes del backend
 
-## Customize configuration
+Quedan fuera del alcance de este repositorio:
+- Lógica de negocio
+- Persistencia de datos
+- Autenticación a nivel servidor
+- Reglas de dominio
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## Arquitectura
 
-## Project Setup
+El proyecto sigue un enfoque de frontend desacoplado, donde la aplicación cliente
+consume servicios expuestos por un backend independiente.
 
-```sh
+La comunicación se realiza a través de HTTP utilizando endpoints REST, permitiendo
+un desarrollo, despliegue y versionado independiente entre frontend y backend.
+
+Este enfoque facilita:
+- Mantenibilidad del código
+- Escalabilidad del sistema
+- Reutilización del backend por otros clientes
+- Independencia tecnológica entre capas
+
+## Tecnologías utilizadas
+
+- Vue 3
+- Vite
+- JavaScript (ES6+)
+- HTML5
+- CSS
+
+Las dependencias y scripts se gestionan mediante npm.
+
+## Estructura del proyecto
+
+```txt
+src/
+ ├─ components/   Componentes reutilizables de la interfaz
+ ├─ pages/        Vistas principales de la aplicación
+ ├─ services/     Lógica de comunicación con la API
+ ├─ hooks/        Lógica reutilizable del cliente
+ ├─ styles/       Estilos globales
+ └─ main.js       Punto de entrada de la aplicación
+Configuración del entorno
+
+Antes de ejecutar el proyecto, asegúrese de tener instalado:
+
+Node.js (versión recomendada LTS)
+
+npm
+
+Las variables de entorno se gestionan mediante archivos .env, los cuales no se incluyen
+en el repositorio por motivos de seguridad.
+
+Instalación
+
+Clonar el repositorio e instalar dependencias:
+
 npm install
-```
+Ejecución en entorno de desarrollo
 
-### Compile and Hot-Reload for Development
+Para levantar el servidor de desarrollo con recarga en caliente:
 
-```sh
 npm run dev
-```
 
-### Compile and Minify for Production
+La aplicación estará disponible en el puerto configurado por Vite.
 
-```sh
+Build de producción
+
+Para generar los archivos optimizados para producción:
+
 npm run build
-```
+
+El resultado se genera en el directorio dist/.
+
+Integración con backend
+
+Este frontend está diseñado para consumir un backend ubicado en un repositorio separado.
+La URL base del backend se configura mediante variables de entorno.
+
+Este diseño permite cambiar el backend sin modificar la lógica interna del frontend,
+siempre que se mantenga el contrato de la API.
+
+Estándares y buenas prácticas
+
+Separación clara entre vistas, componentes y servicios
+
+Código modular y reutilizable
+
+Uso de convenciones consistentes de nombres
+
+Evitar lógica de negocio en el cliente
+
+Manejo explícito de errores provenientes de la API
