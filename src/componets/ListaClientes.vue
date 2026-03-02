@@ -2,10 +2,14 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { personasAPI } from '@/services/api'
+import { usePermissions } from '@/composables/usePermissions'
 import FormularioEditarCliente from '@/componets/FormularioEditarCliente.vue'
 import FormularioEliminarCliente from '@/componets/FormularioEliminarCliente.vue'
 
 const router = useRouter()
+const { canOnlyView, canAccessWithLimit, getRecordLimitMessage } = usePermissions()
+const notificationMessage = ref('')
+const showNotification = ref(false)
 
 // Props para recibir filtros del padre
 const props = defineProps({
@@ -37,6 +41,15 @@ const obtenerClientes = async () => {
   }
 }
 
+// Mostrar notificación
+const showDemoNotification = () => {
+  notificationMessage.value = getRecordLimitMessage()
+  showNotification.value = true
+  setTimeout(() => {
+    showNotification.value = false
+  }, 4000)
+}
+
 // Clientes filtrados por búsqueda y año
 const clientesFiltrados = computed(() => {
   return clientes.value.filter(cliente => {
@@ -48,12 +61,21 @@ const clientesFiltrados = computed(() => {
       (cliente.apellidos && cliente.apellidos.toLowerCase().includes(props.filtros.busqueda.toLowerCase())) ||
       (cliente.rut && cliente.rut.includes(props.filtros.busqueda))
     
-    // Filtrar por año (si el cliente tiene datos de ese año)
-    // Por ahora, mostrar todos los clientes (el filtro de año es más para asuntos/instancias)
+    // Filtrar por año
     const coincideAno = true
     
     return coincideBusqueda && coincideAno
   })
+})
+
+// Verificar si demo puede acceder
+const puedeAcceder = computed(() => {
+  return canAccessWithLimit(clientes.value.length)
+})
+
+// Mostrar mensaje si demo no puede acceder
+const mostrarMensajeLimite = computed(() => {
+  return !puedeAcceder.value && canOnlyView.value
 })
 
 // Obtener clientes cuando el componente se carga
@@ -131,8 +153,27 @@ const verDetalleAsistencia = (cliente) => {
       </div>
     </div>
 
+    <!-- Mensaje de límite para demo -->
+    <div v-if="mostrarMensajeLimite" class="mb-6 p-5 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg flex items-start gap-4 shadow-sm">
+      <svg class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <p class="text-yellow-800 font-semibold text-sm">Acceso Limitado - Modo Demo</p>
+        <p class="text-yellow-700 text-sm mt-2">No hay acceso a clientes en modo demo cuando hay más de 10 registros. Registros actuales: {{ clientes.length }}</p>
+      </div>
+    </div>
+
+    <!-- NotificaciónGlobal de Demo -->
+    <div
+      v-if="showNotification"
+      class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg animate-pulse"
+    >
+      <p class="text-blue-800 font-semibold text-sm">{{ notificationMessage }}</p>
+    </div>
+
     <!-- Tabla de clientes mejorada -->
-    <div v-if="!loading && !error && clientesFiltrados.length > 0" class="overflow-x-auto rounded-xl">
+    <div v-if="!loading && !error && !mostrarMensajeLimite && clientesFiltrados.length > 0" class="overflow-x-auto rounded-xl">
       <table class="w-full">
         <thead>
           <tr class="border-b-2 border-muni-green-200 bg-gradient-to-r from-muni-green-50 to-muni-green-100">
@@ -173,14 +214,16 @@ const verDetalleAsistencia = (cliente) => {
                   </svg>
                 </button>
                 
-                <!-- Componente Editar -->
+                <!-- Componente Editar - Solo para Admin -->
                 <FormularioEditarCliente 
+                  v-if="!canOnlyView"
                   :cliente="cliente"
                   @cliente-actualizado="handleClienteActualizado"
                 />
                 
-                <!-- Componente Eliminar -->
+                <!-- Componente Eliminar - Solo para Admin -->
                 <FormularioEliminarCliente 
+                  v-if="!canOnlyView"
                   :cliente="cliente"
                   @cliente-eliminado="handleClienteEliminado"
                 />

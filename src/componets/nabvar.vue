@@ -1,3 +1,19 @@
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { authAPI } from '@/services/auth'
+
+const router = useRouter()
+const showUserMenu = ref(false)
+
+const user = authAPI.getCurrentUser()
+
+const handleLogout = () => {
+  authAPI.logout()
+  router.push({ name: 'Login' })
+}
+</script>
+
 <template>
 <nav class="sticky top-0 z-50 bg-gradient-to-r from-muni-green-700 via-muni-green-600 to-muni-green-700 border-b-2 border-muni-green-500 shadow-lg">
   <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -54,18 +70,50 @@
       </li>
     </ul>
 
-    <!-- Contacto y Mobile menu -->
-    <div class="flex items-center gap-4">
-      <!-- Icono contacto (desktop) -->
-      <a 
-        href="mailto:soporte@municipio.gov" 
-        class="hidden md:flex items-center gap-2 text-muni-green-100 hover:text-white transition duration-300 text-sm font-medium group"
-        title="Enviar correo a soporte"
-      >
-        <svg class="w-5 h-5 group-hover:scale-110 transition duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      </a>
+    <!-- Usuario y Logout -->
+    <div class="flex items-center gap-6">
+      <!-- Info usuario (desktop) -->
+      <div v-if="user" class="hidden sm:flex items-center gap-3">
+        <div class="text-right">
+          <p class="text-white text-sm font-semibold">{{ user.nombre }}</p>
+          <p class="text-xs text-muni-green-200 capitalize">{{ user.rol }}</p>
+        </div>
+        <div class="w-10 h-10 bg-gradient-to-br from-muni-green-300 to-muni-green-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+          {{ user.nombre.charAt(0).toUpperCase() }}
+        </div>
+      </div>
+
+      <!-- Dropdown logout -->
+      <div class="relative">
+        <button
+          @click="showUserMenu = !showUserMenu"
+          class="flex items-center gap-2 text-muni-green-100 hover:text-white transition duration-300 p-2 rounded-lg hover:bg-muni-green-600"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+
+        <!-- Menu dropdown -->
+        <div
+          v-if="showUserMenu"
+          class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl overflow-hidden z-50"
+        >
+          <div v-if="user" class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <p class="text-sm font-semibold text-gray-900">{{ user.nombre }}</p>
+            <p class="text-xs text-gray-600">{{ user.username }}</p>
+          </div>
+          <button
+            @click="handleLogout"
+            class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition duration-200 flex items-center gap-2 font-semibold"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
 
       <!-- Mobile menu button -->
       <button class="md:hidden text-muni-green-100 hover:text-white transition duration-300 p-2 rounded-lg hover:bg-muni-green-600">
@@ -75,9 +123,12 @@
       </button>
     </div>
   </div>
+
+  <!-- Cerrar menu al presionar Escape -->
+  <script>
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') showUserMenu.value = false
+    })
+  </script>
 </nav>
 </template>
-
-<style scoped>
-/* Las transiciones están en Tailwind */
-</style>

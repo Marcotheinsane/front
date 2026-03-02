@@ -1,9 +1,14 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { instanciasAPI, asuntosAPI } from '@/services/api'
+import { usePermissions } from '@/composables/usePermissions'
 import FormularioEditarInstancia from '@/componets/FormularioEditarInstancia.vue'
 import FormularioEliminarInstancia from '@/componets/FormularioEliminarInstancia.vue'
 import ListaAsistentesInstancia from '@/componets/ListaAsistentesInstancia.vue'
+
+const { canOnlyView, canAccessWithLimit, getRecordLimitMessage } = usePermissions()
+const notificationMessage = ref('')
+const showNotification = ref(false)
 
 // Props para recibir filtros del padre
 const props = defineProps({
@@ -20,6 +25,15 @@ const loading = ref(false)
 const error = ref(null)
 const mostrarAsistentes = ref(false)
 const instanciaSeleccionada = ref(null)
+
+// Mostrar notificación
+const showDemoNotification = () => {
+  notificationMessage.value = getRecordLimitMessage()
+  showNotification.value = true
+  setTimeout(() => {
+    showNotification.value = false
+  }, 4000)
+}
 
 // Función para obtener instancias
 const obtenerInstancias = async () => {
@@ -59,6 +73,16 @@ const getNombreAsunto = (asuntoId) => {
   const asunto = asuntos.value.find(a => a.id === asuntoId)
   return asunto?.nombre|| 'Sin asunto'
 }
+
+// Verificar si demo puede acceder
+const puedeAcceder = computed(() => {
+  return canAccessWithLimit(instancias.value.length)
+})
+
+// Mostrar mensaje si demo no puede acceder
+const mostrarMensajeLimite = computed(() => {
+  return !puedeAcceder.value && canOnlyView.value
+})
 
 // Instancias filtradas
 const instanciasFiltradas = computed(() => {
@@ -164,8 +188,27 @@ const formatearFecha = (fecha) => {
       </div>
     </div>
 
+    <!-- Mensaje de límite para demo -->
+    <div v-if="mostrarMensajeLimite" class="mb-6 p-5 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg flex items-start gap-4 shadow-sm">
+      <svg class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <p class="text-yellow-800 font-semibold text-sm">Acceso Limitado - Modo Demo</p>
+        <p class="text-yellow-700 text-sm mt-2">No hay acceso a instancias en modo demo cuando hay más de 10 registros. Registros actuales: {{ instancias.length }}</p>
+      </div>
+    </div>
+
+    <!-- Notificación Global de Demo -->
+    <div
+      v-if="showNotification"
+      class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg animate-pulse"
+    >
+      <p class="text-blue-800 font-semibold text-sm">{{ notificationMessage }}</p>
+    </div>
+
     <!-- Tabla de instancias mejorada -->
-    <div v-if="!loading && !error && instanciasFiltradas.length > 0" class="overflow-x-auto rounded-xl">
+    <div v-if="!loading && !error && !mostrarMensajeLimite && instanciasFiltradas.length > 0" class="overflow-x-auto rounded-xl">
       <table class="w-full">
         <thead>
           <tr class="border-b-2 border-muni-green-200 bg-gradient-to-r from-muni-green-50 to-muni-green-100">
@@ -206,14 +249,16 @@ const formatearFecha = (fecha) => {
                   Ver Asistentes
                 </button>
                 
-                <!-- Componente Editar -->
+                <!-- Componente Editar - Solo para Admin -->
                 <FormularioEditarInstancia 
+                  v-if="!canOnlyView"
                   :instancia="instancia"
                   @instancia-actualizada="handleInstanciaActualizada"
                 />
                 
-                <!-- Componente Eliminar -->
+                <!-- Componente Eliminar - Solo para Admin -->
                 <FormularioEliminarInstancia 
+                  v-if="!canOnlyView"
                   :instancia="instancia"
                   @instancia-eliminada="handleInstanciaEliminada"
                 />
