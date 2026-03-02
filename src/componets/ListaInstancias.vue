@@ -57,7 +57,7 @@ const obtenerInstancias = async () => {
 // Obtener nombre del asunto
 const getNombreAsunto = (asuntoId) => {
   const asunto = asuntos.value.find(a => a.id === asuntoId)
-  return asunto?.nombre || 'Sin asunto'
+  return asunto?.nombre|| 'Sin asunto'
 }
 
 // Instancias filtradas

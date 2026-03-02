@@ -176,13 +176,13 @@ onMounted(() => {
             <!-- Nombre -->
             <td class="px-6 py-4">
               <div class="font-semibold text-gray-900">
-                {{ asistente.persona?.nombres }} {{ asistente.persona?.apellidos }}
+                {{ asistente.nombres }} {{ asistente.apellidos }}
               </div>
             </td>
 
             <!-- RUT -->
             <td class="px-6 py-4">
-              <div class="text-gray-600 font-mono text-sm">{{ asistente.persona?.rut || '-' }}</div>
+              <div class="text-gray-600 font-mono text-sm">{{ asistente.rut || '-' }}</div>
             </td>
 
             <!-- Estado actual -->

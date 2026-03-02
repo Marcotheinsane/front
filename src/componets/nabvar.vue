@@ -6,7 +6,7 @@
       <!-- Logo Municipal Blanco (si existe) -->
       <div class="flex items-center justify-center">
         <img 
-          src="/logo-municipal-blanco.svg" 
+          src="/docs/logo municipal blanco.png" 
           alt="Logo Municipal" 
           class="h-10 w-10 object-contain drop-shadow-lg transition duration-300 hover:scale-110" 
           onerror="this.style.display='none'"
