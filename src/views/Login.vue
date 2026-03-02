@@ -52,16 +52,16 @@ const handleKeyPress = (e) => {
   }
 }
 
-// Credenciales demo
-const usarDemoUser = () => {
-  username.value = 'demo'
-  password.value = 'demo123'
-}
+// Credenciales demo - SOLO PARA DESARROLLO LOCAL (comentado en producción)
+// const usarDemoUser = () => {
+//   username.value = 'demo'
+//   password.value = 'demo123'
+// }
 
-const usarAdminUser = () => {
-  username.value = 'admin'
-  password.value = 'admin123'
-}
+// const usarAdminUser = () => {
+//   username.value = 'admin'
+//   password.value = 'admin123'
+// }
 </script>
 
 <template>
@@ -103,6 +103,7 @@ const usarAdminUser = () => {
               id="username"
               v-model="username"
               type="text"
+              autocomplete="username"
               placeholder="Ingresa tu usuario"
               @keypress="handleKeyPress"
               :disabled="loading"
@@ -120,6 +121,7 @@ const usarAdminUser = () => {
                 id="password"
                 v-model="password"
                 :type="mostrarPassword ? 'text' : 'password'"
+                autocomplete="current-password"
                 placeholder="Ingresa tu contraseña"
                 @keypress="handleKeyPress"
                 :disabled="loading"
@@ -154,44 +156,6 @@ const usarAdminUser = () => {
             {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
           </button>
         </form>
-
-        <!-- Divider -->
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-muni-green-200"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-muni-green-600 font-semibold">Credenciales de demo</span>
-          </div>
-        </div>
-
-        <!-- Botones demo -->
-        <div class="grid grid-cols-2 gap-3">
-          <button
-            @click="usarDemoUser"
-            type="button"
-            :disabled="loading"
-            class="bg-blue-50 hover:bg-blue-100 disabled:opacity-50 border-2 border-blue-300 text-blue-700 hover:text-blue-800 font-semibold py-2 px-4 rounded-lg transition duration-300"
-          >
-            <div class="text-xs font-bold">Demo User</div>
-            <div class="text-xs text-blue-600 mt-1">demo / demo123</div>
-          </button>
-          <button
-            @click="usarAdminUser"
-            type="button"
-            :disabled="loading"
-            class="bg-purple-50 hover:bg-purple-100 disabled:opacity-50 border-2 border-purple-300 text-purple-700 hover:text-purple-800 font-semibold py-2 px-4 rounded-lg transition duration-300"
-          >
-            <div class="text-xs font-bold">Admin</div>
-            <div class="text-xs text-purple-600 mt-1">admin / admin123</div>
-          </button>
-        </div>
-
-        <!-- Footer info -->
-        <div class="text-center text-xs text-muni-green-600">
-          <p>Estas credenciales son solo para desarrollo</p>
-          <p class="mt-1">Usa tus credenciales reales en producción</p>
-        </div>
       </div>
     </div>
   </div>

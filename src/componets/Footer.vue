@@ -77,7 +77,7 @@
                 <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
               </svg>
               <span class="hover:text-white transition">
-                Ciudad, País
+                Valdivia, Chile
               </span>
             </li>
           </ul>
@@ -91,11 +91,7 @@
           <ul class="space-y-2 text-muni-green-200 text-sm">
             <li class="flex justify-between">
               <span>Lunes - Viernes:</span>
-              <span>08:00 - 17:00</span>
-            </li>
-            <li class="flex justify-between">
-              <span>Sábado:</span>
-              <span>09:00 - 13:00</span>
+              <span>08:30 - 02:00</span>
             </li>
             <li class="flex justify-between">
               <span>Domingo:</span>
